@@ -10,17 +10,21 @@
  */
 #include "../include/random.hpp"
 
-int main(int argc, char** argv)
-{
-    int random_number = generate_random_number<int>(0, 10);
-    cout << "I generated a random number!" << endl;
-    cout << random_number << endl;
+#define BOOST_TEST_MODULE RandomUtilsTests
 
-    auto random_vect = random_vector(0, 10, 100);
-    cout << "I generated a random vector!!" << endl;
-    for (size_t i = 0; i < random_vect.size(); i++)
-    {
-        cout << random_vect.at(i) << " ";
-    }
-    
+#include <boost/test/included/unit_test.hpp>
+
+BOOST_AUTO_TEST_SUITE(RandomUtilsTests);
+
+BOOST_AUTO_TEST_CASE(single_random_number)
+{
+    auto rand = generate_random_number<int>(1, 1000);
+    BOOST_CHECK( rand >= 1 );
+    BOOST_CHECK( rand <= 1000 );
+}
+
+BOOST_AUTO_TEST_CASE(fill_vector)
+{
+    vector<float> rand_vect = random_vector<float>(0, 1000, 50);
+    BOOST_CHECK( rand_vect.size() == 50);
 }
