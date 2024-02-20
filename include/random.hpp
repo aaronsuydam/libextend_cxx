@@ -15,78 +15,12 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 using namespace chrono;
 
-
-#define SIZE 1000000
-
-
 std::random_device seed;
 std::mt19937 mersenne_generator(seed());
-std::mt19937_64 mersenne64_generator(seed());
-std::default_random_engine default_generator(seed());
-
-
-void test_random_generators()
-{
-    string output = "Testing random number generators...\nGenerating 1,000,000 random numbers...\n";
-    test_mersenne_engine();
-    test_mersenne64_engine();
-    test_default_random_engine();
-
-}
-
-void test_mersenne_engine()
-{
-    array<int, SIZE> mersenne_array;
-    auto start = high_resolution_clock::now();
-    for (int i = 0; i < 1000000; i++)
-    {
-        uniform_int_distribution<int> spread(0, 100);
-        mersenne_array[i] = spread(mersenne_generator);
-    }
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(end - start);
-    cout << "Mersenne Twister 32-bit: " << duration.count() << " microseconds" << endl;
-}
-
-void test_mersenne64_engine()
-{
-    array<int, SIZE> mersenne64_array;
-    auto start = high_resolution_clock::now();
-    for (int i = 0; i < 1000000; i++)
-    {
-        uniform_int_distribution<int> spread(0, 100);
-        mersenne64_array[i] = spread(mersenne64_generator);
-    }
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(end - start);
-    cout << "Mersenne Twister 64-bit: " << duration.count() << " microseconds" << endl;
-}
-
-void test_default_random_engine()
-{
-    array<int, SIZE> default_engine_array;
-    auto start = high_resolution_clock::now();
-    for (int i = 0; i < 1000000; i++)
-    {
-        uniform_int_distribution<int> spread(0, 100);
-        default_engine_array[i] = spread(default_generator);
-    }
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(end - start);
-    cout << "Default Generator:  " << duration.count() << " microseconds" << endl;
-}
-
-
-
-
-
-
-
-
-
 
 
 /**
@@ -96,30 +30,65 @@ void test_default_random_engine()
  * integers, floats, etc. 
  */
 
-
-// int generateRandomInt(int lower_bound, int upper_bound)
-// {
-//     uniform_int_distribution<int> spread(lower_bound, upper_bound);
-//     int to_return = spread(random_number_engine);
-//     return to_return;
-// }
-
-
-
-
-
-
-
-chrono::hh_mm_ss<minutes> generateRandomTime()
+/**
+ * @brief 
+ * 
+ * @tparam T 
+ * @param lower_bound 
+ * @param upper_bound 
+ * @return T 
+ */
+template <typename T, enable_if_t<is_integral<T>::value, bool> = true>
+T generate_random_number(T lower_bound, T upper_bound)
 {
-    random_device seed;
-    mt19937 generator(seed());
-    uniform_int_distribution minutes_dist(0, 1439);
-
-    int random_minutes = minutes_dist(generator);
-    chrono::minutes minute= chrono::minutes((random_minutes * 5));
-    chrono::hh_mm_ss<chrono::minutes> thing{minute};
-    return thing;
+    uniform_int_distribution<T> spread(lower_bound, upper_bound);
+    return spread(mersenne_generator);
 }
+
+/**
+ * @brief 
+ * 
+ * @tparam T 
+ * @param lower_bound 
+ * @param upper_bound 
+ * @return T 
+ */
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+T generate_random_number(T lower_bound, T upper_bound)
+{
+    uniform_real_distribution<T> spread(lower_bound, upper_bound);
+    return spread(mersenne_generator);
+}
+
+template <typename T>
+vector<T> random_vector(T lower_bound, T upper_bound, size_t num_elements)
+{
+    std::vector<T> to_return;
+    to_return.reserve(num_elements);
+    for (size_t i = 0; i < num_elements; i++)
+    {
+        auto rand = generate_random_number<T>(lower_bound, upper_bound);
+        to_return.push_back(rand);
+    }
+    return to_return;
+    
+}
+
+
+
+
+
+
+// chrono::hh_mm_ss<minutes> generateRandomTime()
+// {
+//     random_device seed;
+//     mt19937 generator(seed());
+//     uniform_int_distribution minutes_dist(0, 1439);
+
+//     int random_minutes = minutes_dist(generator);
+//     chrono::minutes minute= chrono::minutes((random_minutes * 5));
+//     chrono::hh_mm_ss<chrono::minutes> thing{minute};
+//     return thing;
+// }
 
 
