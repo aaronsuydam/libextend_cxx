@@ -60,5 +60,6 @@
     },
     "github.copilot.advanced": {
         
-    }
+    },
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
 }
