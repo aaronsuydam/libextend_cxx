@@ -57,5 +57,8 @@
         "stop_token": "cpp",
         "streambuf": "cpp",
         "thread": "cpp"
+    },
+    "github.copilot.advanced": {
+        
     }
 }
