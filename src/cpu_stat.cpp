@@ -6,7 +6,7 @@ namespace libex
 {
     namespace Perf
     {
-        void CPU_Statistics::update()
+        void CPU_Core_Statistics::update()
         {
             if(!proc_stat.is_open())
             {
@@ -20,7 +20,15 @@ namespace libex
             }
 
             string line;
-            getline(proc_stat, line);
+            string core_identifier = "cpu" + to_string(core_num);
+            while(getline(proc_stat, line))
+            {
+                if(line.find(core_identifier) != string::npos)
+                {
+                    break;
+                }
+            }
+
             istringstream iss(line);
             vector<string> tokens;
             copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
@@ -47,6 +55,43 @@ namespace libex
             system_percent = (system_diff / (float)total_diff) * 100;
             idle_percent = (idle_diff / (float)total_diff) * 100;
             return;
+        };
+
+        CPU_Info::CPU_Info()
+        {
+            ifstream proc_cpuinfo;
+            proc_cpuinfo.open("/proc/cpuinfo");
+            if(!proc_cpuinfo.is_open())
+            {
+                throw(runtime_error("Error opening /proc/cpuinfo"));
+            }
+
+            string line;
+            while(getline(proc_cpuinfo, line))
+            {
+                if(line.find("processor") != string::npos)
+                {
+                    num_cores++;
+                }
+            }
+
+            for(size_t i = 0; i < num_cores; i++)
+            {
+                stats_cores.push_back(CPU_Core_Statistics(i));
+            }
+
+            overall_stats = CPU_Core_Statistics(num_cores);
+            overall_stats.update();
+            proc_cpuinfo.close();
+        }
+
+        void CPU_Info::update()
+        {
+            overall_stats.update();
+            for(auto& core : stats_cores)
+            {
+                core.update();
+            }
         }
     }
 }

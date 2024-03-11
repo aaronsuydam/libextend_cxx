@@ -10,7 +10,7 @@ namespace libex
 {
     namespace Perf
     {
-        class CPU_Statistics
+        class CPU_Core_Statistics
         {
             private:
 
@@ -26,6 +26,8 @@ namespace libex
                 size_t guest;
                 size_t guest_nice;
                 size_t total;
+
+                size_t core_num;
                 
                 float user_percent;
                 float system_percent;
@@ -35,7 +37,24 @@ namespace libex
                 
 
             public:
-                CPU_Statistics();
+                CPU_Core_Statistics(size_t core_id)
+                {
+                    user = 0;
+                    nice = 0;
+                    system = 0;
+                    idle = 0;
+                    iowait = 0;
+                    irq = 0;
+                    softirw = 0;
+                    steal = 0;
+                    guest = 0;
+                    guest_nice = 0;
+                    total = 0;
+                    core_num = core_id;
+                    user_percent = 0;
+                    system_percent = 0;
+                    idle_percent = 0;
+                };
 
                 void update();
 
@@ -57,6 +76,21 @@ namespace libex
                 float get_idle_percent() const { return idle_percent; }
 
         };
+
+        class CPU_Info
+        {
+            private:
+
+            CPU_Core_Statistics overall_stats;
+            vector<CPU_Core_Statistics> stats_cores;
+            size_t num_cores;
+            
+            public:
+
+            CPU_Info();
+            void update();
+
+        }
 
     }
 }
