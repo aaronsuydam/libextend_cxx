@@ -23,3 +23,13 @@ chrono::nanoseconds test_exec_time(std::function<ret_type> to_benchmark, Argumen
     return chrono::duration_cast<chrono::nanoseconds>(end - start);
 }
 
+
+template <typename ret_type, typename... Argument_t>
+chrono::nanoseconds test_memory_usage(std::function<ret_type> to_benchmark, Argument_t... args)
+{
+    auto start = chrono::high_resolution_clock::now();
+    to_benchmark(args...); // launch this in a thread
+    // poll the memory usage of the process. 
+    auto end = chrono::high_resolution_clock::now();
+    return chrono::duration_cast<chrono::nanoseconds>(end - start);
+}
