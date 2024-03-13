@@ -10,13 +10,16 @@ namespace libex
         {
             if(!proc_stat.is_open())
             {
-                try {
-                    proc_stat.open("/proc/stat");
-                } 
-                catch (const ifstream::failure& e) {
-                    cerr << "Error opening /proc/stat: " << e.what() << endl;
-                    return;
+                proc_stat.open("/proc/stat");
+                if(!proc_stat.is_open())
+                {
+                    throw(runtime_error("Error opening /proc/stat"));
                 }
+            }
+            else
+            {
+                proc_stat.clear();
+                proc_stat.seekg(0, ios::beg);
             }
 
             string line;
@@ -31,6 +34,7 @@ namespace libex
 
             istringstream iss(line);
             vector<string> tokens;
+            cout << "I make it this far" << endl;
             copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
 
             size_t user_diff = stoul(tokens.at(1)) - user;
@@ -50,10 +54,12 @@ namespace libex
 
             size_t new_total = user + nice + system + idle + iowait + irq + softirw + steal + guest + guest_nice;
             size_t total_diff = new_total - total;
+            total = new_total;
 
             user_percent = (user_diff / (float)total_diff) * 100;
             system_percent = (system_diff / (float)total_diff) * 100;
             idle_percent = (idle_diff / (float)total_diff) * 100;
+            cout << "This constructor succeeds" << endl;
             return;
         };
 

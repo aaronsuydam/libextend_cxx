@@ -37,7 +37,7 @@ namespace libex
                 
 
             public:
-                CPU_Core_Statistics(size_t core_id)
+                CPU_Core_Statistics(size_t core_id = -1)
                 {
                     user = 0;
                     nice = 0;
@@ -54,6 +54,8 @@ namespace libex
                     user_percent = 0;
                     system_percent = 0;
                     idle_percent = 0;
+
+                    update();
                 };
 
                 void update();
@@ -69,6 +71,7 @@ namespace libex
                 size_t get_steal() const { return steal; }
                 size_t get_guest() const { return guest; }
                 size_t get_guest_nice() const { return guest_nice; }
+                size_t get_total() const { return total; }
 
                 /* Getters */
                 float get_user_percent() const { return user_percent; }
@@ -90,7 +93,7 @@ namespace libex
             CPU_Info();
             void update();
 
-        }
+        };
 
     }
 }
