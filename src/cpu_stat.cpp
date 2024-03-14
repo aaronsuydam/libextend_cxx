@@ -106,6 +106,24 @@ namespace libex
             {
                 core.update();
             }
+
+            this->update_clocks();
+        }
+
+        void CPU_Info::update_clocks()
+        {
+            size_t counter = 0;
+            for_each(cpu_clock_rates.begin(), cpu_clock_rates.end(), [&](float& rate){
+                std::filesystem::path clock_file_path = "/sys/devices/system/cpu/cpu" + to_string(counter) + "/cpufreq/scaling_cur_freq";
+                ifstream cpu_n_clock_file(clock_file_path);
+                if(!cpu_n_clock_file.is_open())
+                {
+                    throw(runtime_error("Error opening " + clock_file_path.string()));
+                }
+                string line;
+                getline(cpu_n_clock_file, line);
+                rate = stof(line);
+            });
         }
 
 

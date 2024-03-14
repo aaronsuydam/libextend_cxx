@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iterator>
 #include <algorithm>
+#include <filesystem>
 #include <map>
 #include "../include/string_utils.hpp"
 using namespace std;
@@ -85,22 +86,24 @@ namespace libex
 
         class CPU_Info
         {
-            private:
+            public:
 
             // Overall Timing Statistics object
             CPU_Core_Time_Statistics cpu_timing_stats;
+            
             // Per-core Timing Statistics objects
             vector<CPU_Core_Time_Statistics> cores_stats;
 
+            vector<float> cpu_clock_rates;
+
             // Number of cores
             size_t num_cores;
-            
-            public:
 
             map<string, string> core_info;
             
             CPU_Info();
             void update();
+            void update_clocks();
 
         };
 
@@ -123,6 +126,21 @@ namespace libex
 
         };
 
+        /**
+         * @brief Struct to contain CPU clocks for overall
+         * and each core.
+         * 
+         */
+        struct CPU_Clocks
+        {
+            float cpu_clock;
+            vector<float> core_clocks;
+
+            CPU_Clocks()
+            {
+                cpu_clock = 0;
+            }
+        };
 
     }
 }

@@ -3,6 +3,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <thread>
 #include "../include/cpu_stat.hpp"
+
 using namespace libex::Perf;
 using namespace std;
 
@@ -78,5 +79,27 @@ BOOST_AUTO_TEST_CASE(test_cpu_info_retreival)
     for (const auto& entry : cpu_info.core_info) {
         BOOST_TEST_MESSAGE(entry.first << ": " << entry.second);
     }
+}
+
+BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring)
+{
+    CPU_Info cpu_info;
+    if(cpu_info.cpu_clock_rates.empty())
+    {
+        BOOST_FAIL("CPU Clock Rates not retreived.");
+    }
+
+    for(size_t i = 0; i < 20; i++)
+    {
+        cpu_info.update_clocks();
+        this_thread::sleep_for(chrono::seconds(1));
+        size_t counter = 0;
+        for(const auto& clock_rate : cpu_info.cpu_clock_rates)
+        {
+            BOOST_TEST_MESSAGE("CPU" << counter << " clock: " << clock_rate);
+        }
+    }
+
+
 }
 
