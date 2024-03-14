@@ -20,24 +20,27 @@ using namespace std;
  * are being updated correctly.
  * 
  */
-BOOST_AUTO_TEST_CASE(test_cpu_stats)
+BOOST_AUTO_TEST_CASE(test_cpu_time_update)
 {
-    CPU_Core_Statistics cpu_core_stats(0);
+    CPU_Core_Time_Statistics cpu_core_stats;
+    cpu_core_stats.set_is_overall(true);
+    cpu_core_stats.update();
 
     thread t1([&cpu_core_stats](){
-        for(int i = 0; i < 12; i++)
+        for(int i = 0; i < 25; i++)
         {
             cpu_core_stats.update();
-            this_thread::sleep_for(chrono::seconds(1));
+            this_thread::sleep_for(chrono::milliseconds(500));
         }
     });
+
+    this_thread::sleep_for(chrono::seconds(2));
 
     thread t2([&cpu_core_stats](){
         
         size_t previous_total_time = 0;
         string current_cpu_time = "";
-        this_thread::sleep_for(chrono::seconds(2));
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < 10; i++)
         {
             if(cpu_core_stats.get_total() <= previous_total_time)
             {
@@ -48,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_cpu_stats)
             current_cpu_time = "Elapsed CPU Time: " + to_string(cpu_core_stats.get_total());
             cout << current_cpu_time << endl;
             previous_total_time = cpu_core_stats.get_total();
-            this_thread::sleep_for(chrono::milliseconds(1113));
+            this_thread::sleep_for(chrono::seconds(1));
         }
     });
 
@@ -56,3 +59,24 @@ BOOST_AUTO_TEST_CASE(test_cpu_stats)
     t1.join();
     t2.join();
 }
+
+/* Test the retreival of CPU information */
+BOOST_AUTO_TEST_CASE(test_cpu_info_retreival)
+{
+    CPU_Info cpu_info;
+    if(cpu_info.core_info.empty())
+    {
+        BOOST_FAIL("CPU Information not retreived.");
+    }
+
+    if(cpu_info.core_info.at("vendor_id").empty())
+    {
+        BOOST_FAIL("CPU Core Information not retreived.");
+    }
+
+    BOOST_TEST_MESSAGE("CPU Information:");
+    for (const auto& entry : cpu_info.core_info) {
+        BOOST_TEST_MESSAGE(entry.first << ": " << entry.second);
+    }
+}
+

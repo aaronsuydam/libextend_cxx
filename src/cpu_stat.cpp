@@ -6,8 +6,9 @@ namespace libex
 {
     namespace Perf
     {
-        void CPU_Core_Statistics::update()
+        void CPU_Core_Time_Statistics::update()
         {
+            /* Make sure that the file is actually open. */
             if(!proc_stat.is_open())
             {
                 proc_stat.open("/proc/stat");
@@ -16,27 +17,34 @@ namespace libex
                     throw(runtime_error("Error opening /proc/stat"));
                 }
             }
-            else
+            else // Updating, so re-read the contents of the file. 
             {
                 proc_stat.clear();
                 proc_stat.seekg(0, ios::beg);
             }
 
             string line;
-            string core_identifier = "cpu" + to_string(core_num);
-            while(getline(proc_stat, line))
+            if(is_overall) // If this is the overall CPU statistics, then we don't need to search for the core.
             {
-                if(line.find(core_identifier) != string::npos)
+                getline(proc_stat, line);
+            }
+            else
+            {
+                string core_identifier = "cpu" + to_string(core_num);
+                while(getline(proc_stat, line))
                 {
-                    break;
+                    if(line.find(core_identifier) != string::npos)
+                    {
+                        cout << "Found core " << core_identifier << endl;
+                        break;
+                    }
                 }
             }
 
             istringstream iss(line);
             vector<string> tokens;
-            cout << "I make it this far" << endl;
             copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
-
+            
             size_t user_diff = stoul(tokens.at(1)) - user;
             size_t system_diff = stoul(tokens.at(3)) - system;
             size_t idle_diff = stoul(tokens.at(4)) - idle;
@@ -59,45 +67,118 @@ namespace libex
             user_percent = (user_diff / (float)total_diff) * 100;
             system_percent = (system_diff / (float)total_diff) * 100;
             idle_percent = (idle_diff / (float)total_diff) * 100;
-            cout << "This constructor succeeds" << endl;
             return;
         };
 
+        /**
+         * @brief Construct a new CPU_Info object.
+         * 
+         * This constructor will initalize the CPU_Info object with
+         * the number of cores, logical threads supported, and other
+         * CPUID information. 
+         * 
+         */
         CPU_Info::CPU_Info()
         {
-            ifstream proc_cpuinfo;
-            proc_cpuinfo.open("/proc/cpuinfo");
-            if(!proc_cpuinfo.is_open())
-            {
-                throw(runtime_error("Error opening /proc/cpuinfo"));
-            }
-
-            string line;
-            while(getline(proc_cpuinfo, line))
-            {
-                if(line.find("processor") != string::npos)
-                {
-                    num_cores++;
-                }
-            }
-
+            Proc_CPUInfo_Reader proc_cpuinfo;
+            num_cores = proc_cpuinfo.num_cores;
+            
             for(size_t i = 0; i < num_cores; i++)
             {
-                stats_cores.push_back(CPU_Core_Statistics(i));
+                cores_stats.push_back(CPU_Core_Time_Statistics());
+                cores_stats.at(i).set_core_num(i);
             }
 
-            overall_stats = CPU_Core_Statistics(num_cores);
-            overall_stats.update();
-            proc_cpuinfo.close();
+            cpu_timing_stats.set_is_overall(true);
+            cpu_timing_stats.update();
+
+            auto core_0_info = proc_cpuinfo.core_info.at(0);
+            for (const auto& entry : core_0_info) {
+                this->core_info[entry.first] = entry.second;
+            }
+            
         }
 
         void CPU_Info::update()
         {
-            overall_stats.update();
-            for(auto& core : stats_cores)
+            cpu_timing_stats.update();
+            for(auto& core : cores_stats)
             {
                 core.update();
             }
         }
+
+
+        Proc_CPUInfo_Reader::Proc_CPUInfo_Reader()
+        {
+            retrieve();
+        }
+
+        void Proc_CPUInfo_Reader::retrieve()
+        {
+            std::ifstream cpuinfoFile("/proc/cpuinfo");
+            if (!cpuinfoFile.is_open()) 
+            { 
+                throw std::runtime_error("Error opening /proc/cpuinfo");
+            }
+            
+            std::string line;
+            map<string, string> core_0_info;
+            /* Fill with core 0 information */
+            while (std::getline(cpuinfoFile, line)) {
+                std::istringstream iss(line);
+                std::string key, value;
+                
+                // Get the raw key
+                std::getline(iss, key, ':');
+                if (key.empty()) {
+                    break;
+                }
+                
+                // Normalize the key: remove spaces and convert to lowercase for consistency
+                key = string_utils::trim_trailing_whitespace(key);
+                std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+                // Trim leading whitespace from the value
+                std::getline(iss >> std::ws, value);
+
+                // Store the normalized key and value in the map
+                core_0_info.emplace(key, value);
+            }
+
+            core_info.push_back(core_0_info);
+
+            // Once you have the number of cores, finish filling the core_info map
+            for (size_t i = 1; i < stoul(core_info.at(0)["cpu cores"]); i++)
+            {
+                map<string, string> core_i_info_map;
+                while (std::getline(cpuinfoFile, line)) {
+                    std::istringstream iss(line);
+                    std::string key, value;
+                    
+                    // Get the raw key
+                    std::getline(iss, key, ':');
+                    if (key.empty()) {
+                        break;
+                    }
+                    
+                    // Normalize the key: remove spaces and convert to lowercase for consistency
+                    key = string_utils::trim_trailing_whitespace(key);
+                    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+                    // Trim leading whitespace from the value
+                    std::getline(iss >> std::ws, value);
+
+                    // Store the normalized key and value in the map
+                    core_i_info_map.emplace(key, value);
+                }
+                core_info.push_back(core_i_info_map);
+            }
+
+            this->num_cores = stoul(core_info.at(0)["cpu cores"]);
+            cpuinfoFile.close();
+            
+        }
+        
     }
 }

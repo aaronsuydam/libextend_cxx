@@ -36,7 +36,7 @@ namespace libex {
             return a == b;
         }
 
-                inline string trim_trailing_whitespace(string to_trim)
+        inline string trim_trailing_whitespace(string to_trim)
         {
             size_t end_meaningful_contents = to_trim.find_last_not_of(" \t\n\r\f\v");
             if(end_meaningful_contents != string::npos)

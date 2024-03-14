@@ -4,13 +4,16 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <algorithm>
+#include <map>
+#include "../include/string_utils.hpp"
 using namespace std;
 
 namespace libex
 {
     namespace Perf
     {
-        class CPU_Core_Statistics
+        class CPU_Core_Time_Statistics
         {
             private:
 
@@ -28,6 +31,7 @@ namespace libex
                 size_t total;
 
                 size_t core_num;
+                bool is_overall = false;
                 
                 float user_percent;
                 float system_percent;
@@ -37,7 +41,7 @@ namespace libex
                 
 
             public:
-                CPU_Core_Statistics(size_t core_id = -1)
+                CPU_Core_Time_Statistics()
                 {
                     user = 0;
                     nice = 0;
@@ -50,15 +54,14 @@ namespace libex
                     guest = 0;
                     guest_nice = 0;
                     total = 0;
-                    core_num = core_id;
                     user_percent = 0;
                     system_percent = 0;
                     idle_percent = 0;
-
-                    update();
                 };
 
                 void update();
+                void set_core_num(size_t core_num) { this->core_num = core_num; }
+                void set_is_overall(bool is_overall) { this->is_overall = is_overall; }
 
                 /* Getters for primitives. */
                 size_t get_user() const { return user; }
@@ -84,16 +87,42 @@ namespace libex
         {
             private:
 
-            CPU_Core_Statistics overall_stats;
-            vector<CPU_Core_Statistics> stats_cores;
+            // Overall Timing Statistics object
+            CPU_Core_Time_Statistics cpu_timing_stats;
+            // Per-core Timing Statistics objects
+            vector<CPU_Core_Time_Statistics> cores_stats;
+
+            // Number of cores
             size_t num_cores;
             
             public:
 
+            map<string, string> core_info;
+            
             CPU_Info();
             void update();
 
         };
+
+
+        /**
+         * @brief Parser for /proc/cpuinfo.
+         * 
+         * On instantiation, reads the contents of /proc/cpuinfo,
+         * making the data accessible via the `core_info` member.
+         */
+        struct Proc_CPUInfo_Reader
+        {
+            
+            vector<map<string, string>> core_info;
+            size_t num_cores;
+            //bool is_heterogeneous;
+
+            Proc_CPUInfo_Reader();
+            void retrieve();
+
+        };
+
 
     }
 }
