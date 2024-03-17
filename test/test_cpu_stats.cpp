@@ -4,8 +4,13 @@
 #include <thread>
 #include "../include/cpu_stat.hpp"
 
+#define WITHOUT_NUMPY
+
+#include "../include/matplotlib.hpp"
+
 using namespace libex::Perf;
 using namespace std;
+namespace plt = matplotlibcpp;
 
 
 
@@ -81,7 +86,7 @@ BOOST_AUTO_TEST_CASE(test_cpu_info_retreival)
     }
 }
 
-BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring)
+BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring_1)
 {
     CPU_Info cpu_info;
     if(cpu_info.cpu_clock_rates.empty())
@@ -100,7 +105,36 @@ BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring)
             counter++;
         }
     }
-
-
 }
 
+BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring_2)
+{
+    CPU_Info cpu_info; // Assuming this is a class that monitors CPU clocks.
+
+    plt::figure_size(1200, 780); // Set the size of the figure.
+
+    // Plot initial CPU clock rates. Assuming `cpu_info.cpu_clock_rates` is a std::vector<double> or similar.
+    plt::plot(cpu_info.cpu_clock_rates);
+    plt::show(false); // Do not block execution with the initial show.
+    vector<float> cpu_clock_rates;
+
+    for(size_t i = 0; i < 200; i++)
+    {
+        cpu_info.update_clocks(); // Update the CPU clocks.
+        cpu_clock_rates.push_back(cpu_info.cpu_clock_rates.at(0));
+        // Update the plot with new CPU clock rates.
+        plt::clf(); // Clear the current figure.
+        plt::plot(cpu_clock_rates); // Plot the updated clock rates.
+        plt::pause(0.01); // Pause to update the figure window, value can be adjusted based on update frequency requirement.
+
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // Simulate time passing.
+
+        size_t counter = 0;
+        for(const auto& clock_rate : cpu_info.cpu_clock_rates)
+        {
+            BOOST_TEST_MESSAGE("CPU" << counter << " clock: " << clock_rate);
+            counter++;
+        }
+    }
+    plt::show(); // Optionally show the plot at the end if you want to hold the final plot open.
+}

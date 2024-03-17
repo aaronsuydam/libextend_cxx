@@ -10,7 +10,9 @@ if use_asan
     ld_flags = ['-fsanitize=address']
 endif
 
-
+python_dep = dependency('python', modules : ['matplotlib'], required : true)
+cc = meson.get_compiler('cpp')
+libpython = cc.find_library('python3.12', required : true) 
 
 source_files = [
   'src/cpu_stat.cpp',
@@ -42,5 +44,5 @@ test_cpu_stats = executable('test_cpu_stats', ['test/test_cpu_stats.cpp'],
   include_directories : include_directories,
   cpp_args : cpp_flags,
   link_args : ld_flags,
-  dependencies : [libextend_dep, boost_test_dep]
+  dependencies : [libextend_dep, boost_test_dep, python_dep, libpython],
 )
