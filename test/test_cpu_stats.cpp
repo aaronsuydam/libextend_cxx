@@ -97,6 +97,7 @@ BOOST_AUTO_TEST_CASE(test_cpu_clock_monitoring)
         for(const auto& clock_rate : cpu_info.cpu_clock_rates)
         {
             BOOST_TEST_MESSAGE("CPU" << counter << " clock: " << clock_rate);
+            counter++;
         }
     }
 

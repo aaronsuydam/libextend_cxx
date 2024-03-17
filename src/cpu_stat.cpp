@@ -82,6 +82,7 @@ namespace libex
         {
             Proc_CPUInfo_Reader proc_cpuinfo;
             num_cores = proc_cpuinfo.num_cores;
+            this->cpu_clock_rates = vector<float>(num_cores, 0.0);
             
             for(size_t i = 0; i < num_cores; i++)
             {
@@ -90,13 +91,15 @@ namespace libex
             }
 
             cpu_timing_stats.set_is_overall(true);
-            cpu_timing_stats.update();
 
             auto core_0_info = proc_cpuinfo.core_info.at(0);
             for (const auto& entry : core_0_info) {
                 this->core_info[entry.first] = entry.second;
             }
+
+            this->update();
             
+
         }
 
         void CPU_Info::update()

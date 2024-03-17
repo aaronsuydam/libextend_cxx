@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug: test_cpu_stats",
+            "name": "Debug: test_cpu_stats - CPU Clock Monitoring",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/builddir/test_cpu_stats",
-            "args": [],
+            "args": ["--run_test=test_cpu_clock_monitoring"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
