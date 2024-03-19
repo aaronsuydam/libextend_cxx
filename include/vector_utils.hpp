@@ -7,7 +7,7 @@ using namespace std;
 
 namespace libex
 {
-    namespace vector
+    namespace vector_utils
     {
 
         template <typename T>

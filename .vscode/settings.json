@@ -64,5 +64,9 @@
     "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
     "C_Cpp.default.compileCommands": "/home/bubba/dev/libextend_cxx/builddir/compile_commands.json",
     "C_Cpp.default.includePath": ["/mnt/c/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/shared/",
-                                  "/mnt/c/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/um/"]
+                                "/mnt/c/Program Files (x86)/Windows Kits/10/Include/10.0.22000.0/um/"
+                            ],
+                            "github.copilot.enable": {
+                                "markdown": "true"
+                            }
 }
