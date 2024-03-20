@@ -50,7 +50,8 @@ namespace libex
                 converter(element, ss);
             }
             string result = ss.str();
-            if(std::isspace(*(result.end()--)))
+            size_t trailing_space_candidate = result.at(result.size() - 1);
+            if(std::isspace(trailing_space_candidate))
             {
                 result = result.substr(0, result.size() - 1);
             }
