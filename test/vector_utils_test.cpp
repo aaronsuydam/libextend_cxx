@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE( print_contents_vector_int )
     vector<int> vec = {1, 2, 3, 4, 5};
     auto print_contents_int_lambda = [&vec](){ print_contents<int>(vec); };
     string result = test_and_capture_output(print_contents_int_lambda);
-    BOOST_CHECK_EQUAL(result, "1 2 3 4 5\n");
+    BOOST_CHECK_EQUAL(result, "1 2 3 4 5 \n");
 }
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_string )
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE( print_contents_vector_string )
     vector<string> vec = {"one", "two", "three", "four", "five"};
     auto print_contents_string_lambda = [&vec](){ print_contents<string>(vec); };
     string result = test_and_capture_output(print_contents_string_lambda);
-    BOOST_CHECK_EQUAL(result, "one two three four five\n");
+    BOOST_CHECK_EQUAL(result, "one two three four five \n");
 }
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_object_1 )

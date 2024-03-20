@@ -13,7 +13,7 @@ namespace libex
         template <typename T>
         void defaultPrinter(const T& value)
         {
-            cout << value << ' ' << endl;
+            cout << value << ' ';
         }
 
         template <typename T>
@@ -33,12 +33,22 @@ namespace libex
          * @param printer defaults to `defaultPrinter` if none is provided.
          */
         template <typename T, typename Printer = function<void(const T&)>>
-        void print_contents(const vector<T>& vec, Printer printer = defaultPrinter<T>)
+        void print_contents(const vector<T>& vec, Printer printer)
         {
             for(const auto& element : vec)
             {
                 printer(element);
             }
+        };
+
+        template <typename T>
+        void print_contents(const vector<T>& vec)
+        {
+            for(const auto& element : vec)
+            {
+                defaultPrinter(element);
+            }
+            cout << endl;
         };
 
         template <typename T, typename Stringify = function<void(const T&, stringstream&)>>
