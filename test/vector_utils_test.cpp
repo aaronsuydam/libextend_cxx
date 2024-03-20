@@ -26,21 +26,24 @@ void print_person(const Person &p)
 BOOST_AUTO_TEST_CASE( print_contents_vector_int )
 {
     vector<int> vec = {1, 2, 3, 4, 5};
-    string result = test_and_capture_output(print_contents<int>, vec);
+    auto print_contents_int_lambda = [&vec](){ print_contents<int>(vec); };
+    string result = test_and_capture_output(print_contents_int_lambda);
     BOOST_CHECK_EQUAL(result, "1 2 3 4 5\n");
 }
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_string )
 {
     vector<string> vec = {"one", "two", "three", "four", "five"};
-    string result = test_and_capture_output(print_contents<string>, vec);
+    auto print_contents_string_lambda = [&vec](){ print_contents<string>(vec); };
+    string result = test_and_capture_output(print_contents_string_lambda);
     BOOST_CHECK_EQUAL(result, "one two three four five\n");
 }
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_object_1 )
 {
     vector<Person> vec = {{"John", 25}, {"Doe", 30}, {"Jane", 20}};
-    string result = test_and_capture_output(print_contents<Person>, vec);
+    auto print_contents_person_lambda = [&vec](){ print_contents<Person>(vec, print_person); };
+    string result = test_and_capture_output(print_contents_person_lambda);
     BOOST_CHECK_EQUAL(result, "Name: John, Age: 25\nName: Doe, Age: 30\nName: Jane, Age: 20\n");
 }
 
