@@ -16,6 +16,14 @@ namespace libex
             cout << value << ' ' << endl;
         }
 
+        template <typename T>
+        void defaultStringify(const T& value, stringstream& ss)
+        {
+            ss << value << ' ';
+        }
+
+
+
         /**
          * @brief 
          * 
@@ -33,16 +41,20 @@ namespace libex
             }
         };
 
-        template <typename T, typename Printer = function<void(const T&)>>
-        std::string stringify(vector<T> vec, Printer printer = defaultPrinter<T>)
+        template <typename T, typename Stringify = function<void(const T&, stringstream&)>>
+        std::string stringify(vector<T> vec, Stringify converter = defaultStringify<T>)
         {
             std::stringstream ss;
             for(const auto& element : vec)
             {
-                printer(element);
-                ss << element << ' ';
+                converter(element, ss);
             }
-            return ss.str();
+            string result = ss.str();
+            if(std::isspace(*(result.end()--)))
+            {
+                result = result.substr(0, result.size() - 1);
+            }
+            return result;
         }
     };
 };

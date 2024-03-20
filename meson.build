@@ -53,3 +53,6 @@ test_vector_utils = executable('test_vector_utils', ['test/vector_utils_test.cpp
   link_args : ld_flags,
   dependencies : [libextend_dep, boost_test_dep],
 )
+
+# Define a test to run the executable
+test('vector_utils_test', test_vector_utils)
