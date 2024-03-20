@@ -1,19 +1,47 @@
 #define BOOST_TEST_MODULE Vector_Utils_Test
 
 #include "../include/vector_utils.hpp"
+#include "../include/testing.hpp"
 #include <boost/test/unit_test.hpp>
+#include <boost/process.hpp>
+#include <sstream>
+#include <fstream>
 using namespace std;
+using namespace libex::Testing;
+using namespace libex::vector_utils;
+
+struct Person
+{
+    string name;
+    int age;
+};
+
+void print_person(const Person &p)
+{
+    cout << "Name: " << p.name << ", Age: " << p.age << endl;
+}
+
+
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_int )
 {
     vector<int> vec = {1, 2, 3, 4, 5};
-    libex::vector_utils::print_contents(vec);
+    string result = test_and_capture_output(print_contents<int>, vec);
+    BOOST_CHECK_EQUAL(result, "1 2 3 4 5\n");
 }
 
 BOOST_AUTO_TEST_CASE( print_contents_vector_string )
 {
     vector<string> vec = {"one", "two", "three", "four", "five"};
-    libex::vector_utils::print_contents(vec);
+    string result = test_and_capture_output(print_contents<string>, vec);
+    BOOST_CHECK_EQUAL(result, "one two three four five\n");
+}
+
+BOOST_AUTO_TEST_CASE( print_contents_vector_object_1 )
+{
+    vector<Person> vec = {{"John", 25}, {"Doe", 30}, {"Jane", 20}};
+    string result = test_and_capture_output(print_contents<Person>, vec);
+    BOOST_CHECK_EQUAL(result, "Name: John, Age: 25\nName: Doe, Age: 30\nName: Jane, Age: 20\n");
 }
 
 BOOST_AUTO_TEST_CASE( stringify_vector_int )
