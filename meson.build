@@ -39,8 +39,9 @@ libextend_dep = declare_dependency(
 # Declare boost dependency
 # Find Boost.Test
 boost_test_dep = dependency('boost', modules : ['unit_test_framework'])
+gtkmm_dep = dependency('gtkmm-4.0', version: '>= 4.10.0')
 
-test_cpu_stats = executable('test_cpu_stats', ['test/test_cpu_stats.cpp'],
+test_cpu_stats = executable('test_cpu_stats', ['test/cpu_stats_test.cpp'],
   include_directories : include_directories,
   cpp_args : cpp_flags,
   link_args : ld_flags,
@@ -56,3 +57,5 @@ test_vector_utils = executable('test_vector_utils', ['test/vector_utils_test.cpp
 
 # Define a test to run the executable
 test('vector_utils_test', test_vector_utils)
+
+subdir('./test/gui')
