@@ -10,9 +10,8 @@ if use_asan
     ld_flags = ['-fsanitize=address']
 endif
 
-python_dep = dependency('python', modules : ['matplotlib'], required : true)
 cc = meson.get_compiler('cpp')
-libpython = cc.find_library('python3.11', required : true) 
+
 
 source_files = [
   'src/cpu_stat.cpp',
@@ -45,7 +44,7 @@ test_cpu_stats = executable('test_cpu_stats', ['test/cpu_stats_test.cpp'],
   include_directories : include_directories,
   cpp_args : cpp_flags,
   link_args : ld_flags,
-  dependencies : [libextend_dep, boost_test_dep, python_dep, libpython],
+  dependencies : [libextend_dep, boost_test_dep],
 )
 
 test_vector_utils = executable('test_vector_utils', ['test/vector_utils_test.cpp'],
@@ -58,4 +57,4 @@ test_vector_utils = executable('test_vector_utils', ['test/vector_utils_test.cpp
 # Define a test to run the executable
 test('vector_utils_test', test_vector_utils)
 
-subdir('./test/gui')
+subdir('./src/linux/gui')
