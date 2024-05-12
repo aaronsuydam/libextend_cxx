@@ -1,1 +1,1 @@
-test
+graphing = executable('graphing', 'graphing.cpp', 'GraphArea.cpp', 'CPU_StatsGraph.cpp', dependencies : [gtkmm_dep])
