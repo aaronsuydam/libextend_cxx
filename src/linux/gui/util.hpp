@@ -1,8 +1,16 @@
 #include <stddef.h>
 #include <string>
+#include <vector>
+#include <gdkmm/rgba.h>
 #include <cairomm/context.h>
 
+using namespace std;
+using namespace Gdk;
+using namespace Gtk;
+
 class coord_pair {
+
+    public:
     size_t x;
     size_t y;
 
@@ -15,7 +23,7 @@ class DataSeries
 
     vector<coord_pair> data_points = vector<coord_pair>(0); // Defaults to a series with no points.
     size_t point_size;
-    rgba_color point_color = rgba_color(0, 0, 0, 1); // Defaults to white.
+    Gdk::RGBA point_color = Gdk::RGBA(0, 0, 0, 1); // Defaults to white.
     
     /**
      * @brief Draws the data series on the graph.
@@ -23,7 +31,7 @@ class DataSeries
      * @param cr 
      */
     void draw_series(const Cairo::RefPtr<Cairo::Context>& cr) {
-        cr->set_source_rgba(point_color.r, point_color.g, point_color.b, point_color.a);
+        cr->set_source_rgba(point_color.get_red_u(), point_color.get_green_u(), point_color.get_blue_u(), point_color.get_alpha_u());
         for (auto point : data_points)
         {
             cr->arc(point.x, point.y, point_size, 0, 2 * M_PI);
@@ -31,7 +39,7 @@ class DataSeries
         }
         cr->stroke();
     }
-}
+};
 
 
 class Line {
@@ -63,4 +71,4 @@ class Axis : public Line
     size_t index_marker_spacing;
 
     Axis() : Line(coord_pair(0, 0), coord_pair(0, 0)) {}
-}
+};
